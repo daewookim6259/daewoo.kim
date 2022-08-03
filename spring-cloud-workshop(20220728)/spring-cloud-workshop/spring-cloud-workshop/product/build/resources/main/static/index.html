@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>작업실적 입력 현황</title>
+
+    <style media="screen">
+        #divClock{
+            width: 90%;
+            margin: 10px auto;
+            font-size: 30px;
+            color: black;
+        }
+
+        .header{
+            width: 90%;
+            margin: 10px auto;
+            margin-top: 50px;
+        }
+
+        .h_label {
+            float: left;
+            width:100px;
+            text-align: center;
+        }
+
+        .h_cbox{
+            float: left;
+            width:120px;
+        }
+
+        .h_input{
+            float: left;
+            width:220px;
+        }
+
+        .h_button{
+            float: left;
+            width:120px;
+        }
+
+        .h_rstcnt{
+            float: left;
+            width:120px;
+        }
+
+        .body{
+            clear: left;
+            width: 90%;
+            margin: 10px auto;
+            margin-top: 100px;
+        }
+    </style>
+
+    <script src = './js/jquery-3.6.0.min.js'/></script>
+
+    <script type="text/javascript">
+        function getDate() {
+            var d = new Date();
+
+            var YY = d.getFullYear();
+            var MM = d.getMonth() + 1;
+            var DD = d.getDate();
+
+            return YY                       + "년 "
+                + (MM > 9 ? MM : "0" + MM) + "월 "
+                + (DD > 9 ? DD : "0" + DD) + "일 "
+                + '일월화수목금토'.charAt(d.getUTCDay())+'요일 ';
+        }
+
+        function getTime() {
+            var d = new Date();
+
+            var HH = d.getHours();
+            var MI = d.getMinutes();
+            var SS = d.getSeconds();
+
+            return (HH > 9 ? HH : "0" + HH) + "시 "
+                + (MI > 9 ? MI : "0" + MI) + "분 "
+                + (SS > 9 ? SS : "0" + SS) + "초 "
+        }
+
+        function showClock(){
+            var currentDate = new Date();
+            var divClock = document.getElementById('divClock');
+            var msg = "Now DateTime : ";
+
+            msg += getDate() + getTime();
+
+            divClock.innerText = msg;
+
+            setTimeout(showClock,1000);  //1초마다 갱신
+        }
+
+        function search()
+        {
+            buildTable(rstArray);
+        }
+
+        var rstArray = [
+
+            {'SEQ':'1', '일자':'20220721', '일시':'092736', '오더번호': '28765391', '공정번호':'1100', '트랜잭션':'01',	'작업자':'20110466', '전문' : ''},
+            {'SEQ':'2', '일자':'20220721', '일시':'093236', '오더번호': '28765391', '공정번호':'1100', '트랜잭션':'06',	'작업자':'20110466', '전문' : ''},
+            {'SEQ':'3', '일자':'20220721', '일시':'102736', '오더번호': '28765392', '공정번호':'1200', '트랜잭션':'01',	'작업자':'19955482', '전문' : ''},
+            {'SEQ':'4', '일자':'20220721', '일시':'103236', '오더번호': '28765392', '공정번호':'1200', '트랜잭션':'06',	'작업자':'19955482', '전문' : ''},
+            {'SEQ':'5', '일자':'20220721', '일시':'112736', '오더번호': '28765393', '공정번호':'1300', '트랜잭션':'01',	'작업자':'20042006', '전문' : ''},
+            {'SEQ':'6', '일자':'20220721', '일시':'113236', '오더번호': '28765393', '공정번호':'1300', '트랜잭션':'06',	'작업자':'20042006', '전문' : ''}
+        ]
+
+        function clearTable(){
+            var trCnt = $('#tbWkrst tr').length;
+
+            var tbStruct = document.getElementById('tbWkrst');
+
+            if (trCnt >= 2)
+            {
+                for(var i = 0; i < trCnt - 1; i++)
+                {
+                    tbStruct.deleteRow(tbStruct.rows.length - 1);
+                }
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        function buildTable(data) {
+
+            clearTable();
+
+            var table = document.getElementById('tbody_wkrst')
+
+            var targetType = document.getElementById("selecttype").value;
+
+            var targetAufnr = document.getElementById("selecttype").value === "aufnr" ? document.getElementById("txt_aufnr").value : "";
+
+            var targetOptor = document.getElementById("selecttype").value === "optor" ? document.getElementById("txt_aufnr").value : "";
+
+            var showArray = data;
+
+            switch (targetType)
+            {
+                case "aufnr":
+                    showArray = data.filter(rst => rst.오더번호 === targetAufnr);
+                    break;
+
+                case "optor":
+                    showArray = data.filter(rst => rst.작업자 === targetOptor);
+                    break;
+            }
+
+            for (var i=0; i < showArray.length; i++)
+            {
+                var row = `<tr>
+                    <td>${showArray[i].SEQ}</td>
+                    <td>${showArray[i].일자}</td>
+                    <td>${showArray[i].일시}</td>
+                    <td>${showArray[i].오더번호}</td>
+                    <td>${showArray[i].공정번호}</td>
+                    <td>${showArray[i].트랜잭션}</td>
+                    <td>${showArray[i].작업자}</td>
+                    <td>${showArray[i].전문}</td>
+                    </tr>`;
+
+                table.innerHTML += row
+            }
+
+            document.getElementById('h_rstcnt').innerHTML = "총 " + showArray.length + "건";
+        }
+
+    </script>
+</head>
+<body onload="showClock()">
+<p></p>
+
+<div id="divClock" class="clock">
+</div>
+
+<p></p>
+
+<div class="header">
+
+    <div class="h_label"> 구분 </div>
+
+    <div class="h_cbox">
+        <form>
+            <select id = "selecttype" name = "selecttype">
+                <option value = "all" selected>전체</option>
+                <option value = "aufnr">오더번호</option>
+                <option value = "optor">작업자사번</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="h_input">
+        <input type = "text" id = "txt_aufnr" name = "txt_aufnr" />
+    </div>
+
+    <div class="h_button">
+        <button type="button" onclick="search()"> 조회 </button>
+    </div>
+
+    <div class="h_rstcnt" id="h_rstcnt"> 총 0건 </div>
+
+</div>
+
+<p></p>
+
+<div class="body">
+
+    <table id="tbWkrst" name="tbWkrst" class="table_wkrst" align="center" border="1" cellspacing="1" width="100%">
+
+        <tr height="40px">
+            <th width=05%>SEQ</th>
+            <th width=10%>일자</th>
+            <th width=10%>일시</th>
+            <th width=10%>오더번호</th>
+            <th width=10%>공정번호</th>
+            <th width=10%>트랜잭션</th>
+            <th width=10%>작업자</th>
+            <th width=35%>전문</th>
+        </tr>
+
+        <tbody id="tbody_wkrst" align="center">
+
+        </tbody>
+
+    </table>
+
+</div>
+
+</body>
+</html>
